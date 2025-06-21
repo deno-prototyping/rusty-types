@@ -6,6 +6,7 @@ export type StructNamedFields = Record<
   StandardSchemaV1
 >;
 export type StructUnitFields = null | undefined;
+export type StructSingleFields = StandardSchemaV1;
 export type StructTupleFields = StandardSchemaV1[];
 export type StructCustomFields = StandardSchemaV1<
   unknown[],
@@ -14,6 +15,7 @@ export type StructCustomFields = StandardSchemaV1<
 export type StructFields =
   | StructNamedFields
   | StructTupleFields
+  | StructSingleFields
   | StructUnitFields;
 
 type TryInferInput<T> = T extends StandardSchemaV1
@@ -27,6 +29,8 @@ type TryInferOutput<T> = T extends StandardSchemaV1
 export type StructInput<SF extends StructFields> =
   // null
   SF extends null ? []
+    // single
+    : SF extends StandardSchemaV1 ? [TryInferInput<SF>]
     // tuple
     : SF extends unknown[] ? { [K in keyof SF]: TryInferInput<SF[K]> }
     // named
@@ -35,6 +39,8 @@ export type StructInput<SF extends StructFields> =
 export type StructOutput<SF extends StructFields> =
   // null
   SF extends null ? Record<PropertyKey, never>
+    // single
+    : SF extends StandardSchemaV1 ? { "0": TryInferOutput<SF> }
     // tuple
     : SF extends unknown[]
       ? { [K in keyof SF as K & `${number}`]: TryInferOutput<SF[K]> }
@@ -67,6 +73,16 @@ export function Struct<const SF extends StructFields>(
     // set fields
     if (fields == null) { // null
       // pass
+    } else if ("~standard" in fields) { // single
+      const validated = (fields as StructSingleFields)["~standard"]
+        .validate(args[0]);
+      if (validated instanceof Promise) {
+        throw new TypeError("schema validation must be sync");
+      }
+      // TODO: wrap issues
+      if (validated.issues) throw validated.issues;
+      // deno-lint-ignore no-explicit-any
+      (this as any)[0] = validated.value;
     } else if (Array.isArray(fields)) { // tuple
       for (const [i, schema] of fields.entries()) {
         const validated = schema["~standard"].validate(args[i]);
