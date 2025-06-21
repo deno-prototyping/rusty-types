@@ -107,7 +107,9 @@ enum Event {
   Paste(String),
 }
 
-let event_1 = Event::Key { code: 123 };
+let event_1 = Event::Key {
+  code: 123
+};
 let event_2 = Event::Mouse {
   button: 123,
   state: 0,
@@ -132,12 +134,16 @@ const Event = Enum(
   } as const,
 );
 
-const event_1 = Event.Key({ code: 123 });
+const event_1 = Event.Key({
+  code: 123
+});
 const event_2 = new Event.Mouse({
   button: 123,
   state: 0
 });
-const event_3 = new Event.Paste("some text");
+const event_3 = new Event.Paste(
+  "some text"
+);
 ```
 
 </td>
