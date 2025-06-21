@@ -36,8 +36,8 @@ export type Struct<SF extends StructFields> = {
 };
 
 export function Struct<const SF extends StructFields>(
-  name: string,
   fields: SF,
+  { name = "" } = {},
   // TODO: allow methods using ThisType
   // TODO: allow extends
   // methods: any
@@ -96,10 +96,11 @@ export type Enum<SS extends Record<string, StructFields>> = {
 
 export function Enum<SS extends Record<string, StructFields>>(
   ss: SS,
+  { name = "" } = {},
 ): Enum<SS> {
   return Object.fromEntries(
     Object.entries(ss).map(function ([key, schema]) {
-      return [key, Struct(key, schema)];
+      return [key, Struct(schema, { name: `${name}.${key}` })];
     }),
   ) as unknown as Enum<SS>;
 }

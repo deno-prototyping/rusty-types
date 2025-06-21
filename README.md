@@ -48,7 +48,7 @@ let person = Person {
 <td>
 
 ```typescript
-const Person = Struct("Person", {
+const Person = Struct({
   name: z.string(),
   age: z.number(),
 });
@@ -80,7 +80,7 @@ let vec = Vec3(1., 2., 3.);
 <td>
 
 ```typescript
-const Vec3 = Struct("Vec3", [
+const Vec3 = Struct([
   z.number(),
   z.number(),
   z.number(),
@@ -123,16 +123,14 @@ let event_3 = Event::Paste(
 <td>
 
 ```typescript
-const Event = Enum(
-  {
-    Key: { code: z.number() },
-    Mouse: {
-      state: z.number(),
-      button: z.number()
-    },
-    Paste: [z.string()],
-  } as const,
-);
+const Event = Enum({
+  Key: { code: z.number() },
+  Mouse: {
+    state: z.number(),
+    button: z.number()
+  },
+  Paste: [z.string()] as const,
+});
 
 const event_1 = Event.Key({
   code: 123
