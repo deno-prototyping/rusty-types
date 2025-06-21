@@ -71,7 +71,9 @@ const bob = Person({
 <td>
 
 ```rust
-struct Vec3(f32, f32);
+struct Vec3(f32, f32, f32);
+
+let vec = Vec3(1., 2., 3.);
 ```
 
 </td>
@@ -104,6 +106,15 @@ enum Event {
   },
   Paste(String),
 }
+
+let event_1 = Event::Key { code: 123 };
+let event_2 = Event::Mouse {
+  button: 123,
+  state: 0,
+};
+let event_3 = Event::Paste(
+  "some text".into()
+);
 ```
 
 </td>
@@ -126,7 +137,7 @@ const event_2 = new Event.Mouse({
   button: 123,
   state: 0
 });
-const event_3 = new Event.Paste("foo");
+const event_3 = new Event.Paste("some text");
 ```
 
 </td>
