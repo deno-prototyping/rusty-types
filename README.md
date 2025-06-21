@@ -38,7 +38,10 @@ struct Person {
   age: usize,
 }
 
-let person = Person { name: "Alice".into(), age: 20 };
+let person = Person {
+  name: "Alice".into(),
+  age: 20
+};
 ```
 
 </td>
@@ -50,8 +53,14 @@ const Person = Struct("Person", {
   age: z.number(),
 });
 
-const alice = new Person({ name: "Alice", age: 20 });
-const bob = Person({ name: "Bob", age: 22 });
+const alice = new Person({
+  name: "Alice",
+  age: 20
+});
+const bob = Person({
+  name: "Bob",
+  age: 22
+});
 ```
 
 </td>
@@ -104,13 +113,19 @@ enum Event {
 const Event = Enum(
   {
     Key: { code: z.number() },
-    Mouse: { state: z.number(), button: z.number() },
+    Mouse: {
+      state: z.number(),
+      button: z.number()
+    },
     Paste: [z.string()],
   } as const,
 );
 
 const event_1 = Event.Key({ code: 123 });
-const event_2 = new Event.Mouse({ button: 123, state: 0 });
+const event_2 = new Event.Mouse({
+  button: 123,
+  state: 0
+});
 const event_3 = new Event.Paste("foo");
 ```
 
