@@ -5,12 +5,16 @@ export type StructNamedFields = Record<
   Exclude<string | symbol, "~standard">,
   StandardSchemaV1
 >;
+export type StructNullishFields = null | undefined;
 export type StructTupleFields = StandardSchemaV1[];
 export type StructCustomFields = StandardSchemaV1<
   unknown[],
   Record<string | symbol, unknown>
 >;
-export type StructFields = StructNamedFields | StructTupleFields;
+export type StructFields =
+  | StructNamedFields
+  | StructTupleFields
+  | StructNullishFields;
 
 type TryInferInput<T> = T extends StandardSchemaV1
   ? StandardSchemaV1.InferInput<T>
@@ -20,13 +24,22 @@ type TryInferOutput<T> = T extends StandardSchemaV1
   ? StandardSchemaV1.InferOutput<T>
   : never;
 
-export type StructInput<SF extends StructFields> = SF extends unknown[]
-  ? { [K in keyof SF]: TryInferInput<SF[K]> }
-  : [{ [K in keyof SF]: TryInferInput<SF[K]> }];
+export type StructInput<SF extends StructFields> =
+  // null
+  SF extends null ? []
+    // tuple
+    : SF extends unknown[] ? { [K in keyof SF]: TryInferInput<SF[K]> }
+    // named
+    : [{ [K in keyof SF]: TryInferInput<SF[K]> }];
 
-export type StructOutput<SF extends StructFields> = SF extends unknown[]
-  ? { [K in keyof SF as K & `${number}`]: TryInferOutput<SF[K]> }
-  : { [K in keyof SF]: TryInferOutput<SF[K]> };
+export type StructOutput<SF extends StructFields> =
+  // null
+  SF extends null ? Record<PropertyKey, never>
+    // tuple
+    : SF extends unknown[]
+      ? { [K in keyof SF as K & `${number}`]: TryInferOutput<SF[K]> }
+    // named
+    : { [K in keyof SF]: TryInferOutput<SF[K]> };
 
 export type Struct<SF extends StructFields> = {
   /** factory */
@@ -36,7 +49,7 @@ export type Struct<SF extends StructFields> = {
 };
 
 export function Struct<const SF extends StructFields>(
-  fields: SF,
+  fields?: SF,
   init?: string | { name?: string },
   // TODO: allow methods using ThisType
   // TODO: allow extends
@@ -52,7 +65,9 @@ export function Struct<const SF extends StructFields>(
     if (!(this instanceof struct)) return new struct(...args);
 
     // set fields
-    if (Array.isArray(fields)) { // tuple
+    if (fields == null) { // null
+      // pass
+    } else if (Array.isArray(fields)) { // tuple
       for (const [i, schema] of fields.entries()) {
         const validated = schema["~standard"].validate(args[i]);
         if (validated instanceof Promise) {
