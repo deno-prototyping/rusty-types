@@ -37,11 +37,13 @@ export type Struct<SF extends StructFields> = {
 
 export function Struct<const SF extends StructFields>(
   fields: SF,
-  { name = "" } = {},
+  init?: string | { name?: string },
   // TODO: allow methods using ThisType
   // TODO: allow extends
   // methods: any
 ): Struct<SF> {
+  const name = typeof init == "string" ? init : init?.name ?? "";
+
   const struct = function (
     this: StructOutput<SF> | undefined,
     ...args: StructInput<SF>
@@ -96,8 +98,10 @@ export type Enum<SS extends Record<string, StructFields>> = {
 
 export function Enum<SS extends Record<string, StructFields>>(
   ss: SS,
-  { name = "" } = {},
+  init?: string | { name?: string },
 ): Enum<SS> {
+  const name = typeof init == "string" ? init : init?.name ?? "";
+
   return Object.fromEntries(
     Object.entries(ss).map(function ([key, schema]) {
       return [key, Struct(schema, { name: `${name}.${key}` })];
