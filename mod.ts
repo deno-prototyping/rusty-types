@@ -5,7 +5,7 @@ export type StructNamedFields = Record<
   Exclude<string | symbol, "~standard">,
   StandardSchemaV1
 >;
-export type StructNullishFields = null | undefined;
+export type StructUnitFields = null | undefined;
 export type StructTupleFields = StandardSchemaV1[];
 export type StructCustomFields = StandardSchemaV1<
   unknown[],
@@ -14,7 +14,7 @@ export type StructCustomFields = StandardSchemaV1<
 export type StructFields =
   | StructNamedFields
   | StructTupleFields
-  | StructNullishFields;
+  | StructUnitFields;
 
 type TryInferInput<T> = T extends StandardSchemaV1
   ? StandardSchemaV1.InferInput<T>
